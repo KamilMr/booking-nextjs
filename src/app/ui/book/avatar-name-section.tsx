@@ -1,5 +1,5 @@
 "use client";
-import { Avatar } from "../ui/avatar";
+import { Avatar } from "../avatar";
 
 // create section for avatgar and name
 export const AvatarNameSection = ({
