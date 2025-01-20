@@ -57,7 +57,7 @@ export default function Page() {
         specialist: 'Specjalista',
         location: 'Lokalizacja',
         type: 'Typ spotkania',
-        date: 'Dzień spotkania',
+        date: 'Dzień',
         hour: 'Godzina spotkania',
         name: 'Imię',
         phone: 'Telefon',
@@ -66,8 +66,15 @@ export default function Page() {
       if (!form[key]) return;
       let value = form[key];
 
-      if (key === 'date') {
-        value = formatDate(new Date(value), 'dd/MM/yyyy');
+      if (key === 'date' || key === 'hour') {
+        if (key === 'date') {
+          value = formatDate(value, 'dd/MM/yyyy');
+        }else {
+          const foundHour = tR.findIndex(v => v.includes('Dzień'));
+          tR[foundHour] = `${tR[foundHour]}, ${form.hour}`;
+          return;
+        }
+
       }
 
       tR.push(`${map[key]}: ${value}`);
