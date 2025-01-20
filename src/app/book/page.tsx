@@ -3,15 +3,18 @@ import {useState} from 'react';
 import clsx from 'clsx';
 import {Button} from '../ui/button';
 import {FirstStep} from '@/app/ui/book/first-step';
-import {Paper} from '@/app/ui/paper';
 import {SecondScreen} from '@/app/ui/book/second-screen';
+import {ThirdPage} from '../ui/book/third-page';
+import {Paper} from '@/app/ui/paper';
 import {AvatarNameSection} from '@/app/ui/book/avatar-name-section';
+import {format as formatDate} from 'date-fns';
 
 interface Form {
   specialist: string;
   location: string;
   type: string;
-  date: string;
+  date: Date;
+  hour: string;
   name: string;
   phone: string;
 }
@@ -20,19 +23,20 @@ const initState = () => ({
   specialist: 'Amy Burns',
   location: '',
   type: '',
-  date: '',
+  date: new Date(),
+  hour: '',
   name: '',
   phone: '',
 });
 
 const allSteps = ['location', 'type', 'date', 'client', 'summary'];
-const plTranslation = {
-  location: 'Miejsce spotkania',
-  type: 'Typ spotkania',
-  date: 'Data spotkania',
-  client: 'Dane klienta',
-  summary: 'Podsumowanie',
-}
+const plTranslation = [
+  'Miejsce spotkania',
+  'Typ spotkania',
+  'Data spotkania',
+  'Dane klienta',
+  'Podsumowanie',
+];
 
 export default function Page() {
   const locations = [
@@ -53,17 +57,24 @@ export default function Page() {
         specialist: 'Specjalista',
         location: 'Lokalizacja',
         type: 'Typ spotkania',
-        date: 'Data',
+        date: 'Dzień spotkania',
+        hour: 'Godzina spotkania',
         name: 'Imię',
         phone: 'Telefon',
       };
 
       if (!form[key]) return;
+      let value = form[key];
 
-      tR.push(`${map[key]}: ${form[key]}`);
+      if (key === 'date') {
+        value = formatDate(new Date(value), 'dd/MM/yyyy');
+      }
+
+      tR.push(`${map[key]}: ${value}`);
     });
     return tR;
   };
+  console.log(form)
   return (
     <div className="flex flex-col items-center justify-center h-screen">
       <Paper className="flex flex-col w-full h-full md:w-1/2 md:h-4/5 justify-between relative">
@@ -101,6 +112,34 @@ export default function Page() {
             value={form.type}
           />
         )}
+
+        {page === 3 && (
+          <ThirdPage
+            date={form.date}
+            selectedHour={form.hour}
+            handleHourSelect={(hour: string) => {
+              setForm({
+                ...form,
+                hour,
+              });
+            }}
+            handleDateChange={(date: Date) => {
+              if (
+                !date ||
+                !mockDataDates.find(
+                  d =>
+                    d.date === formatDate(date, 'dd/MM/yyyy'),
+                )
+              )
+                return;
+              setForm({
+                ...form,
+                date,
+              });
+            }}
+            dates={mockDataDates}
+          />
+        )}
         <div className="flex justify-between">
           <Button
             className={clsx(
@@ -122,3 +161,17 @@ export default function Page() {
     </div>
   );
 }
+
+//  const {date, startHour, endHour, status, id} = cv;
+const mockDataDates = [
+  {date : '22/01/2025', startHour: '08:00', endHour: '09:00', status: 'free'},
+  {date: '22/01/2025', startHour: '10:00', endHour: '11:00', status: 'free'},
+  {date: '22/01/2025', startHour: '12:00', endHour: '13:00', status: 'free'},
+  {date: '22/01/2025', startHour: '14:00', endHour: '15:00', status: 'free'},
+  {date: '22/01/2025', startHour: '16:00', endHour: '17:00', status: 'free'},
+  {date: '22/01/2025', startHour: '18:00', endHour: '19:00', status: 'free'},
+  {date: '22/01/2025', startHour: '20:00', endHour: '21:00', status: 'free'},
+  {date: '22/01/2025', startHour: '22:00', endHour: '23:00', status: 'free'},
+  {date: '18/01/2025', startHour: '11:00', endHour: '12:00', status: 'free'},
+  {date: '19/01/2025', startHour: '12:00', endHour: '13:00', status: 'free'},
+];
